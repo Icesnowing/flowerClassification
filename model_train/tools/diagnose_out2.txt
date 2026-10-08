@@ -1,0 +1,31 @@
+﻿python.exe : WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+所在位置 行:1 字符: 52
++ ... ification"; & ".venv-tf\Scripts\python.exe" "tools\diagnose_int8_2.py ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: All lo...itten to STDERR:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+I0000 00:00:1790220727.356075   15944 port.cc:153] oneDNN custom operations are on. You may see slightly different nume
+rical results due to floating-point round-off errors from different computation orders. To turn them off, set the envir
+onment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1790220728.876199   15944 port.cc:153] oneDNN custom operations are on. You may see slightly different nume
+rical results due to floating-point round-off errors from different computation orders. To turn them off, set the envir
+onment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+===== 全测试集抽样准确率（400张）=====
+E:\AI\Pytorch\flowerClassification\.venv-tf\Lib\site-packages\tensorflow\lite\python\interpreter.py:457: UserWarning:  
+   Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+  FP32: 352/400 = 88.00%
+  INT8: 143/400 = 35.75%
+
+===== 量化参数快照 =====
+
+  best_mobilenet_v3_large_int8.tflite 张量数=259
+  已量化张量: 254 个 | scale 范围 [5.387e-11, 1.511]
+    OUTPUT[PartitionedCall:0]: scale={'scales': array([], dtype=float32), 'zero_points': array([], dtype=int32), 'quantized_dimension': 0, 'block_size': 0}

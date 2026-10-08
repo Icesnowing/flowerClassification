@@ -1,0 +1,59 @@
+﻿python.exe : WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+所在位置 行:1 字符: 52
++ ... ification"; & ".venv-tf\Scripts\python.exe" "tools\diagnose_int8.py"  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: All lo...itten to STDERR:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+I0000 00:00:1790220625.868801   41444 port.cc:153] oneDNN custom operations are on. You may see slightly different nume
+rical results due to floating-point round-off errors from different computation orders. To turn them off, set the envir
+onment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1790220627.356010   41444 port.cc:153] oneDNN custom operations are on. You may see slightly different nume
+rical results due to floating-point round-off errors from different computation orders. To turn them off, set the envir
+onment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+===== 模型结构信息 =====
+E:\AI\Pytorch\flowerClassification\.venv-tf\Lib\site-packages\tensorflow\lite\python\interpreter.py:457: UserWarning:  
+   Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+  best_mobilenet_v3_large_float32.tflite
+    input : dtype=<class 'numpy.float32'> shape=[  1 224 224   3] quant=(0.0, 0)
+    output: dtype=<class 'numpy.float32'> shape=[  1 102] quant=(0.0, 0)
+    ops(134): {'PAD': 5, 'CONV_2D': 47, 'HARD_SWISH': 21, 'DEPTHWISE_CONV_2D': 15, 'ADD': 10, 'MEAN': 9, 'RELU_0_TO_1': 8, 'MUL': 8, 'FULLY_CONNECTED': 2, 'DELEGATE': 9}
+  best_mobilenet_v3_large_float16.tflite
+    input : dtype=<class 'numpy.float32'> shape=[  1 224 224   3] quant=(0.0, 0)
+    output: dtype=<class 'numpy.float32'> shape=[  1 102] quant=(0.0, 0)
+    ops(262): {'DEQUANTIZE': 128, 'PAD': 5, 'CONV_2D': 47, 'HARD_SWISH': 21, 'DEPTHWISE_CONV_2D': 15, 'ADD': 10, 'MEAN': 9, 'RELU_0_TO_1': 8, 'MUL': 8, 'FULLY_CONNECTED': 2, 'DELEGATE': 9}
+  best_mobilenet_v3_large_int8.tflite
+    input : dtype=<class 'numpy.float32'> shape=[  1 224 224   3] quant=(0.0, 0)
+    output: dtype=<class 'numpy.float32'> shape=[  1 102] quant=(0.0, 0)
+    ops(157): {'QUANTIZE': 1, 'PAD': 5, 'CONV_2D': 47, 'HARD_SWISH': 21, 'DEPTHWISE_CONV_2D': 15, 'ADD': 10, 'MEAN': 9, 'RELU_0_TO_1': 8, 'MUL': 8, 'FULLY_CONNECTED': 2, 'DEQUANTIZE': 1, 'DELEGATE': 30}
+
+===== fp32 vs int8 输出对比（前 20 张测试图）=====
+  img0000 label=  0 fp32top=  0(4.740) int8top=  0(-0.172) OK
+  img0001 label=  0 fp32top=  0(7.935) int8top= 18(-3.093) MISMATCH
+  img0002 label=  0 fp32top=  0(3.616) int8top= 90(-3.093) MISMATCH
+  img0003 label=  0 fp32top=  0(10.989) int8top=  0(-0.344) OK
+  img0004 label=  0 fp32top=  0(11.104) int8top=  0(0.515) OK
+  img0005 label=  0 fp32top=  0(7.416) int8top=  0(0.515) OK
+  img0006 label=  0 fp32top=  0(7.594) int8top=  0(-0.172) OK
+  img0007 label=  0 fp32top=  0(5.901) int8top=  0(-1.203) OK
+  img0008 label=  0 fp32top=  0(5.369) int8top=  0(1.203) OK
+  img0009 label=  0 fp32top=  0(1.779) int8top=  0(1.375) OK
+  img0010 label=  0 fp32top=  0(1.675) int8top=  0(-3.265) OK
+  img0011 label=  0 fp32top=  0(-1.889) int8top=  0(-3.437) OK
+  img0012 label=  0 fp32top=  0(7.491) int8top= 75(-1.203) MISMATCH
+  img0013 label=  0 fp32top=  0(3.482) int8top=  0(-1.031) OK
+  img0014 label=  0 fp32top=  0(10.762) int8top=  0(-2.406) OK
+  img0015 label=  0 fp32top= 54(-2.363) int8top= 79(0.000) MISMATCH
+  img0016 label=  0 fp32top=  0(9.307) int8top= 30(-1.546) MISMATCH
+  img0017 label=  0 fp32top=  0(8.659) int8top=  0(0.859) OK
+  img0018 label=  0 fp32top=  0(4.088) int8top= 79(-1.203) MISMATCH
+  img0019 label=  0 fp32top=  0(10.189) int8top=  0(0.172) OK
+
+  Top1 一致率: 14/20 | max abs diff=19.1073 | mean abs diff=5.9382

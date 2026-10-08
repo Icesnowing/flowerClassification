@@ -1,0 +1,14 @@
+# Conda 环境（可选）。默认 CPU；CUDA 请改 channels / pytorch 包或参见 README。
+name: flower-classification
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10,<3.14
+  - pytorch>=2.1.0
+  - torchvision>=0.16.0
+  - numpy>=1.24.0
+  - scipy>=1.10.0
+  - pillow>=10.0.0
+  - pip

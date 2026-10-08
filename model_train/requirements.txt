@@ -1,0 +1,19 @@
+# Flowers102 分类 — 核心依赖（下限版本，兼容本仓库脚本）
+# 推荐 Python：3.10 – 3.13（本机验证：3.13 + torch 2.13 CPU）
+#
+# 默认从 PyPI 安装多为 CPU 版 torch。若需 CUDA，请先按 README「CUDA」小节安装
+# torch / torchvision，再执行：pip install -r requirements.txt
+#
+# 可复现冒烟：pip install -r requirements.txt
+#   python train.py --limit-train 32 --limit-val 32 --epochs 1
+
+torch>=2.1.0
+torchvision>=0.16.0
+numpy>=1.24.0
+scipy>=1.10.0
+Pillow>=10.0.0
+tensorboard>=2.10.0   # P2-1 实验追踪（train.py 默认启用；未安装时自动跳过，不影响训练）
+# wandb>=0.16.0       # 可选：train.py --wandb-project 启用 W&B 云端追踪时取消注释
+onnx>=1.15.0          # P2-2 模型导出（export.py 必需）
+onnxscript>=0.2.0     # P2-2 模型导出（torch>=2.9 的 torch.onnx.export 内部依赖）
+onnxruntime>=1.16.0   # P2-2 导出数值校验 / 部署推理（未安装时 export.py 跳过校验，不影响导出）

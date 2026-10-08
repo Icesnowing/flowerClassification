@@ -1,0 +1,45 @@
+﻿python.exe : WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+所在位置 行:1 字符: 52
++ ... ification"; & ".venv-tf\Scripts\python.exe" "tools\diag_scale.py" *>  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: All lo...itten to STDERR:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+I0000 00:00:1790220797.384063   43340 port.cc:153] oneDNN custom operations are on. You may see slightly different nume
+rical results due to floating-point round-off errors from different computation orders. To turn them off, set the envir
+onment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1790220798.910994   43340 port.cc:153] oneDNN custom operations are on. You may see slightly different nume
+rical results due to floating-point round-off errors from different computation orders. To turn them off, set the envir
+onment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+E:\AI\Pytorch\flowerClassification\.venv-tf\Lib\site-packages\tensorflow\lite\python\interpreter.py:457: UserWarning:  
+   Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+=== 最小 scale 的 12 个张量（疑似退化层）===
+  model_1/tf.nn.relu_13/Relu;model_1/tf.math.add_27/Add;model_1/tf.nn.convolu scale=5.387e-11 zp=0
+  model_1/tf.nn.relu_7/Relu;model_1/tf.math.add_15/Add;model_1/tf.nn.convolut scale=1.802e-10 zp=0
+  model_1/tf.__operators__.add_1/AddV2;model_1/tf.math.multiply_6/Mul;Const_1 scale=4.686e-10 zp=0
+  model_1/tf.nn.convolution_15/convolution                                    scale=3.937e-09 zp=0
+  model_1/tf.nn.convolution_7/convolution                                     scale=3.937e-09 zp=0
+  model_1/tf.nn.relu_7/Relu;model_1/tf.math.add_15/Add;model_1/tf.nn.convolut scale=7.843e-09 zp=0
+  model_1/tf.__operators__.add_26/AddV2;model_1/tf.math.multiply_84/Mul;Const scale=2.525e-06 zp=0
+  model_1/tf.__operators__.add_20/AddV2;model_1/tf.math.multiply_66/Mul;Const scale=2.668e-06 zp=0
+  model_1/tf.__operators__.add_14/AddV2;model_1/tf.math.multiply_48/Mul;Const scale=2.803e-06 zp=0
+  model_1/tf.__operators__.add_17/AddV2;model_1/tf.math.multiply_56/Mul;Const scale=4.105e-06 zp=0
+  model_1/tf.__operators__.add_2/AddV2;model_1/tf.math.multiply_10/Mul;Const_ scale=6.243e-06 zp=0
+  model_1/tf.__operators__.add_3/AddV2;model_1/tf.math.multiply_16/Mul;Const_ scale=6.252e-06 zp=0
+
+=== 最大 scale 的 8 个张量 ===
+  model_1/tf.math.add_68/Add;model_1/tf.compat.v1.nn.depthwise_conv2d_13/dept scale=8.407e-01 zp=85
+  model_1/tf.math.add_59/Add;model_1/tf.nn.convolution_33/convolution;Const_4 scale=9.140e-01 zp=-24
+  model_1/tf.math.add_61/Add                                                  scale=9.140e-01 zp=-24
+  model_1/tf.math.add_75/Add;model_1/tf.compat.v1.nn.depthwise_conv2d_14/dept scale=9.623e-01 zp=72
+  model_1/tf.math.add_51/Add;model_1/tf.compat.v1.nn.depthwise_conv2d_10/dept scale=1.273e+00 zp=97
+  model_1/tf.math.add_47/Add;model_1/tf.nn.convolution_25/convolution;Const_7 scale=1.298e+00 zp=18
+  model_1/tf.math.add_49/Add                                                  scale=1.298e+00 zp=18
+  model_1/tf.math.add_56/Add;model_1/tf.compat.v1.nn.depthwise_conv2d_11/dept scale=1.511e+00 zp=89

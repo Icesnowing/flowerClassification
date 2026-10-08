@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">花卉识别</string>
+    <string name="take_photo">拍照</string>
+    <string name="pick_gallery">相册</string>
+    <string name="loading_model">正在加载模型…</string>
+    <string name="model_ready">模型已就绪。拍照，或从相册选择一张花的照片。</string>
+    <string name="recognizing">正在识别…</string>
+    <string name="pick_cancelled">已取消选图</string>
+    <string name="capture_cancelled">已取消拍照</string>
+    <string name="camera_permission_denied">没有相机权限。请到系统设置中开启相机权限后再拍照。</string>
+    <string name="open_settings">去设置开启相机</string>
+    <string name="no_camera_app">这台设备上没有可用的相机</string>
+    <string name="waiting_for_model">模型还在加载，好了会自动开始识别</string>
+    <string name="recognize_failed">识别失败</string>
+    <string name="confidence">置信度 %1$s</string>
+    <string name="inference_timings">解码 %1$d ms\n预处理 %2$d ms\n推理 %3$d ms</string>
+    <string name="preview_description">选中的照片</string>
+    <string name="back">返回</string>
+</resources>
