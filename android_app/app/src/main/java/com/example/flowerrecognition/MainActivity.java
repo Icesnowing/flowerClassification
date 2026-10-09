@@ -9,6 +9,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.WindowManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
@@ -40,6 +41,7 @@ import com.example.flowerrecognition.ui.NoticeTone;
 import com.example.flowerrecognition.ui.PreviewBitmap;
 import com.example.flowerrecognition.ui.RecognitionPresentation;
 import com.example.flowerrecognition.ui.RecognitionUiState;
+import com.example.flowerrecognition.util.InAppInferenceBenchmark;
 import com.example.flowerrecognition.util.InferenceTimingLog;
 
 import java.io.File;
@@ -73,6 +75,11 @@ public class MainActivity extends ComponentActivity {
     private Button openSettingsButton;
     private TextView noticeBanner;
     private TextView modelStatus;
+    private LinearLayout benchmarkPanel;
+    private TextView benchmarkProgress;
+    private TextView benchmarkReport;
+    private Button benchmarkShareButton;
+    private Button benchmarkCloseButton;
     private LinearLayout runningRow;
     private LinearLayout resultContent;
     private ImageView previewImage;
@@ -131,6 +138,11 @@ public class MainActivity extends ComponentActivity {
         openSettingsButton = findViewById(R.id.openSettingsButton);
         noticeBanner = findViewById(R.id.noticeBanner);
         modelStatus = findViewById(R.id.modelStatus);
+        benchmarkPanel = findViewById(R.id.benchmarkPanel);
+        benchmarkProgress = findViewById(R.id.benchmarkProgress);
+        benchmarkReport = findViewById(R.id.benchmarkReport);
+        benchmarkShareButton = findViewById(R.id.benchmarkShareButton);
+        benchmarkCloseButton = findViewById(R.id.benchmarkCloseButton);
         runningRow = findViewById(R.id.runningRow);
         resultContent = findViewById(R.id.resultContent);
         previewImage = findViewById(R.id.previewImage);
@@ -143,6 +155,12 @@ public class MainActivity extends ComponentActivity {
         pickGalleryButton.setOnClickListener(v -> onPickGallery());
         openSettingsButton.setOnClickListener(v -> openAppSettings());
         backButton.setOnClickListener(v -> backToHome());
+        modelStatus.setOnLongClickListener(v -> {
+            onBenchmarkLongPress();
+            return true;
+        });
+        benchmarkShareButton.setOnClickListener(v -> shareBenchmarkReport());
+        benchmarkCloseButton.setOnClickListener(v -> dismissBenchmarkReport());
         uncertainBanner.setText(RecognitionPresentation.UNCERTAIN_MESSAGE);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (v, insets) -> {
@@ -170,7 +188,7 @@ public class MainActivity extends ComponentActivity {
     }
 
     private void bindHome() {
-        boolean enabled = uiState.modelReady && !uiState.running;
+        boolean enabled = uiState.modelReady && !uiState.running && !uiState.benchmarkRunning;
         takePhotoButton.setEnabled(enabled);
         pickGalleryButton.setEnabled(enabled);
         openSettingsButton.setVisibility(uiState.showCameraSettings ? View.VISIBLE : View.GONE);
@@ -183,7 +201,29 @@ public class MainActivity extends ComponentActivity {
             noticeBanner.setVisibility(View.GONE);
         }
 
+        boolean showBenchmark = uiState.benchmarkRunning || uiState.benchmarkReport != null;
+        benchmarkPanel.setVisibility(showBenchmark ? View.VISIBLE : View.GONE);
+        if (showBenchmark) {
+            if (uiState.benchmarkRunning) {
+                benchmarkProgress.setVisibility(View.VISIBLE);
+                benchmarkProgress.setText(
+                        uiState.benchmarkProgress != null
+                                ? uiState.benchmarkProgress
+                                : getString(R.string.benchmark_running));
+                benchmarkReport.setVisibility(View.GONE);
+                benchmarkShareButton.setVisibility(View.GONE);
+                benchmarkCloseButton.setVisibility(View.GONE);
+            } else {
+                benchmarkProgress.setVisibility(View.GONE);
+                benchmarkReport.setVisibility(View.VISIBLE);
+                benchmarkReport.setText(uiState.benchmarkReport);
+                benchmarkShareButton.setVisibility(View.VISIBLE);
+                benchmarkCloseButton.setVisibility(View.VISIBLE);
+            }
+        }
+
         boolean showStatus = uiState.notice == null
+                && !showBenchmark
                 && (!uiState.modelReady || (uiState.result == null && !uiState.running));
         modelStatus.setVisibility(showStatus ? View.VISIBLE : View.GONE);
         if (showStatus) {
@@ -223,8 +263,13 @@ public class MainActivity extends ComponentActivity {
         resultChinese.setText(result.chinese);
         resultConfidence.setText(getString(R.string.confidence,
                 RecognitionPresentation.confidenceText(result.top1Probability())));
+        long totalMs = state.decodeMs + state.preprocessMs + state.inferenceMs + state.postprocessMs;
         resultTimings.setText(getString(R.string.inference_timings,
-                state.decodeMs, state.preprocessMs, state.inferenceMs));
+                state.decodeMs,
+                state.preprocessMs,
+                state.inferenceMs,
+                state.postprocessMs,
+                totalMs));
         uncertainBanner.setVisibility(
                 RecognitionPresentation.isUncertain(result.top1Probability())
                         ? View.VISIBLE
@@ -348,7 +393,94 @@ public class MainActivity extends ComponentActivity {
     }
 
     private boolean canAcceptImage() {
-        return uiState.modelReady && !uiState.running;
+        return uiState.modelReady && !uiState.running && !uiState.benchmarkRunning;
+    }
+
+    /** 长按「模型已就绪」文案启动内嵌压测（预热 30 + 采样 100）。 */
+    private void onBenchmarkLongPress() {
+        if (!uiState.modelReady || uiState.running || uiState.benchmarkRunning) {
+            return;
+        }
+        FlowerInterpreter model = flowerInterpreter;
+        if (model == null) {
+            return;
+        }
+        uiState.benchmarkRunning = true;
+        uiState.benchmarkProgress = null;
+        uiState.benchmarkReport = null;
+        uiState.notice = null;
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        render();
+        scheduler.execute(() -> runInAppBenchmark(model));
+    }
+
+    private void runInAppBenchmark(FlowerInterpreter model) {
+        Bitmap decoded = null;
+        try {
+            long decodeStart = System.nanoTime();
+            decoded = InAppInferenceBenchmark.loadBenchmarkBitmap(getApplicationContext());
+            long decodeMs = (System.nanoTime() - decodeStart) / 1_000_000L;
+            String report = InAppInferenceBenchmark.run(
+                    getApplicationContext(),
+                    model,
+                    decoded,
+                    decodeMs,
+                    message -> scheduler.postToMain(() -> {
+                        if (isDestroyed() || !uiState.benchmarkRunning) {
+                            return;
+                        }
+                        uiState.benchmarkProgress = message;
+                        render();
+                    }));
+            InAppInferenceBenchmark.writeReport(getApplicationContext(), report);
+            scheduler.postToMain(() -> finishInAppBenchmark(report, null));
+        } catch (Throwable error) {
+            Log.e(InAppInferenceBenchmark.LOG_TAG, "benchmark failed", error);
+            String message = error.getMessage() != null
+                    ? error.getMessage()
+                    : getString(R.string.benchmark_failed);
+            scheduler.postToMain(() -> finishInAppBenchmark(null, message));
+        } finally {
+            if (decoded != null && !decoded.isRecycled()) {
+                decoded.recycle();
+            }
+        }
+    }
+
+    private void finishInAppBenchmark(String report, String errorMessage) {
+        if (isDestroyed()) {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            return;
+        }
+        uiState.benchmarkRunning = false;
+        uiState.benchmarkProgress = null;
+        if (errorMessage != null) {
+            uiState.benchmarkReport = null;
+            uiState.notice = errorMessage;
+            uiState.noticeTone = NoticeTone.ERROR;
+        } else {
+            uiState.benchmarkReport = report;
+            uiState.notice = null;
+        }
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        render();
+    }
+
+    private void shareBenchmarkReport() {
+        String report = uiState.benchmarkReport;
+        if (report == null) {
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.benchmark_share_title));
+        intent.putExtra(Intent.EXTRA_TEXT, report);
+        startActivity(Intent.createChooser(intent, getString(R.string.benchmark_share_report)));
+    }
+
+    private void dismissBenchmarkReport() {
+        uiState.benchmarkReport = null;
+        render();
     }
 
     private void submitImage(Uri uri, ImageSource source) {
@@ -369,6 +501,7 @@ public class MainActivity extends ComponentActivity {
         uiState.decodeMs = 0L;
         uiState.preprocessMs = 0L;
         uiState.inferenceMs = 0L;
+        uiState.postprocessMs = 0L;
         uiState.notice = null;
         uiState.noticeTone = NoticeTone.NEUTRAL;
         render();
@@ -397,6 +530,7 @@ public class MainActivity extends ComponentActivity {
                     uiState.decodeMs = image.decodeMs;
                     uiState.preprocessMs = image.preprocessMs;
                     uiState.inferenceMs = image.inferenceMs;
+                    uiState.postprocessMs = image.postprocessMs;
                     uiState.notice = null;
                     uiState.noticeTone = NoticeTone.NEUTRAL;
                     render();
@@ -436,18 +570,22 @@ public class MainActivity extends ComponentActivity {
                 long runStart = System.nanoTime();
                 float[] logits = model.run(input);
                 long inferenceMs = (System.nanoTime() - runStart) / 1_000_000L;
+                long postprocessStart = System.nanoTime();
                 InferenceResult result = model.recognizeLogits(logits, input);
+                long postprocessMs = (System.nanoTime() - postprocessStart) / 1_000_000L;
                 InferenceTimingLog.append(
                         getApplicationContext(),
                         decodeMs,
                         preprocessMs,
                         inferenceMs,
+                        postprocessMs,
                         source.name());
                 Bitmap shown = PreviewBitmap.scalePreview(decoded);
                 if (shown != decoded && !decoded.isRecycled()) {
                     decoded.recycle();
                 }
-                return new RecognizedImage(shown, result, decodeMs, preprocessMs, inferenceMs);
+                return new RecognizedImage(
+                        shown, result, decodeMs, preprocessMs, inferenceMs, postprocessMs);
             } catch (Throwable error) {
                 if (!decoded.isRecycled()) {
                     decoded.recycle();
@@ -495,6 +633,7 @@ public class MainActivity extends ComponentActivity {
         state.decodeMs = 0L;
         state.preprocessMs = 0L;
         state.inferenceMs = 0L;
+        state.postprocessMs = 0L;
         state.notice = null;
         state.noticeTone = NoticeTone.NEUTRAL;
         render();
@@ -569,18 +708,21 @@ public class MainActivity extends ComponentActivity {
         final long decodeMs;
         final long preprocessMs;
         final long inferenceMs;
+        final long postprocessMs;
 
         RecognizedImage(
                 Bitmap preview,
                 InferenceResult result,
                 long decodeMs,
                 long preprocessMs,
-                long inferenceMs) {
+                long inferenceMs,
+                long postprocessMs) {
             this.preview = preview;
             this.result = result;
             this.decodeMs = decodeMs;
             this.preprocessMs = preprocessMs;
             this.inferenceMs = inferenceMs;
+            this.postprocessMs = postprocessMs;
         }
     }
 }

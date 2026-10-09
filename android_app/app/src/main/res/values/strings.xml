@@ -13,7 +13,12 @@
     <string name="waiting_for_model">模型还在加载，好了会自动开始识别</string>
     <string name="recognize_failed">识别失败</string>
     <string name="confidence">置信度 %1$s</string>
-    <string name="inference_timings">解码 %1$d ms\n预处理 %2$d ms\n推理 %3$d ms</string>
+    <string name="inference_timings">解码 %1$d ms\n预处理 %2$d ms\n推理 %3$d ms\n结果处理 %4$d ms\n总计 %5$d ms</string>
     <string name="preview_description">选中的照片</string>
     <string name="back">返回</string>
+    <string name="benchmark_running">性能测试进行中…</string>
+    <string name="benchmark_share_report">分享报告</string>
+    <string name="benchmark_close_report">关闭</string>
+    <string name="benchmark_failed">性能测试失败</string>
+    <string name="benchmark_share_title">推理性能报告</string>
 </resources>

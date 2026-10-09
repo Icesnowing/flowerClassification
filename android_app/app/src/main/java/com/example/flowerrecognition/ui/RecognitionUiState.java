@@ -18,6 +18,10 @@ public final class RecognitionUiState {
     public long decodeMs = 0L;
     public long preprocessMs = 0L;
     public long inferenceMs = 0L;
+    public long postprocessMs = 0L;
+    public boolean benchmarkRunning = false;
+    public String benchmarkProgress = null;
+    public String benchmarkReport = null;
 
     public RecognitionUiState() {
     }
@@ -37,6 +41,10 @@ public final class RecognitionUiState {
         copy.decodeMs = decodeMs;
         copy.preprocessMs = preprocessMs;
         copy.inferenceMs = inferenceMs;
+        copy.postprocessMs = postprocessMs;
+        copy.benchmarkRunning = benchmarkRunning;
+        copy.benchmarkProgress = benchmarkProgress;
+        copy.benchmarkReport = benchmarkReport;
         return copy;
     }
 }

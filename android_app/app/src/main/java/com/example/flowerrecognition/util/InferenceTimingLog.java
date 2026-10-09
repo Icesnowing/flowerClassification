@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
- * 将解码 / 预处理 / 推理耗时追加写入应用私有目录下的日志文件（debug 与 release 均写入）。
+ * 将解码 / 预处理 / 推理 / 结果处理耗时追加写入应用私有目录下的日志文件（debug 与 release 均写入）。
  */
 public final class InferenceTimingLog {
     public static final String LOG_TAG = "InferenceTimingLog";
@@ -39,8 +39,9 @@ public final class InferenceTimingLog {
             long decodeMs,
             long preprocessMs,
             long inferenceMs,
+            long postprocessMs,
             String source) {
-        String line = formatLine(decodeMs, preprocessMs, inferenceMs, source);
+        String line = formatLine(decodeMs, preprocessMs, inferenceMs, postprocessMs, source);
         Log.i(LOG_TAG, line);
         synchronized (LOCK) {
             File file = logFile(context);
@@ -58,13 +59,15 @@ public final class InferenceTimingLog {
             long decodeMs,
             long preprocessMs,
             long inferenceMs,
+            long postprocessMs,
             String source) {
-        long totalMs = decodeMs + preprocessMs + inferenceMs;
+        long totalMs = decodeMs + preprocessMs + inferenceMs + postprocessMs;
         String timestamp = ZonedDateTime.now().format(TIMESTAMP);
         return timestamp
                 + " decode_ms=" + decodeMs
                 + " preprocess_ms=" + preprocessMs
                 + " inference_ms=" + inferenceMs
+                + " postprocess_ms=" + postprocessMs
                 + " total_ms=" + totalMs
                 + " source=" + source;
     }
