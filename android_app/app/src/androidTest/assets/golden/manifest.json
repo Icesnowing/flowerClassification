@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "input_head_len": 12,
+  "float_abs_tol": 0.0001,
+  "model_basename": "best_mobilenet_v3_large_dynamic.tflite",
+  "model_sha256": "5134a7e9e49dd6b136700aa128c3ae3efc08dc585351ec56ab4f66b254e4ac4e",
+  "cases": [
+    {
+      "id": "_flower_01_rs256",
+      "asset_name": "_flower_01_rs256.png",
+      "json_name": "_flower_01_rs256.json"
+    },
+    {
+      "id": "_flower_01_rs256_2",
+      "asset_name": "_flower_01_rs256_2.png",
+      "json_name": "_flower_01_rs256_2.json"
+    },
+    {
+      "id": "flower_01",
+      "asset_name": "flower_01.png",
+      "json_name": "flower_01.json"
+    },
+    {
+      "id": "rose",
+      "asset_name": "rose.png",
+      "json_name": "rose.json"
+    },
+    {
+      "id": "rose2",
+      "asset_name": "rose2.png",
+      "json_name": "rose2.json"
+    },
+    {
+      "id": "rose3",
+      "asset_name": "rose3.png",
+      "json_name": "rose3.json"
+    }
+  ]
+}

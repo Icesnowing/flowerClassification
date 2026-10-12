@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "source_path": "E:\\AI\\Pytorch\\flowerClassification\\model_train\\images\\rose.png",
+  "golden_image_path": "E:\\AI\\Pytorch\\flowerClassification\\model_train\\golden\\_work_rose.png",
+  "asset_name": "rose.png",
+  "asset_mode": "resized256_png",
+  "input_head_len": 12,
+  "input_head": [
+    1.6495418548583984,
+    1.6232492923736572,
+    1.489673376083374,
+    1.6495418548583984,
+    1.6407562494277954,
+    1.507102608680725,
+    1.6495418548583984,
+    1.6407562494277954,
+    1.507102608680725,
+    1.6666666269302368,
+    1.6407562494277954,
+    1.5245317220687866
+  ],
+  "argmax": 10,
+  "num_logits": 14,
+  "float_abs_tol": 0.0001,
+  "model_basename": "best_mobilenet_v3_large_dynamic.tflite",
+  "model_sha256": "5134a7e9e49dd6b136700aa128c3ae3efc08dc585351ec56ab4f66b254e4ac4e",
+  "preprocess": "Resize(256)+CenterCrop(224)+RGB/255+ImageNet mean/std, NHWC float32"
+}

@@ -46,7 +46,7 @@ public class InferenceBenchmarkTest {
             FlowerInterpreter model = FlowerInterpreter.load(appContext);
             try {
                 String report = InAppInferenceBenchmark.run(appContext, model, decoded, decodeMs, null);
-                Log.i(TAG, report.replace('\n', ' | '));
+                Log.i(TAG, report.replace('\n', '|'));
             } finally {
                 model.close();
                 if (!decoded.isRecycled()) {

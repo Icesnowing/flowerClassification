@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "source_path": "E:\\AI\\Pytorch\\flowerClassification\\model_train\\images\\flower_01.jpg",
+  "golden_image_path": "E:\\AI\\Pytorch\\flowerClassification\\model_train\\golden\\_work_flower_01.png",
+  "asset_name": "flower_01.png",
+  "asset_mode": "resized256_png",
+  "input_head_len": 12,
+  "input_head": [
+    0.5364329218864441,
+    0.9054622650146484,
+    1.5768193006515503,
+    0.5706824660301208,
+    0.9404762387275696,
+    1.5942485332489014,
+    0.6391814351081848,
+    0.9754902720451355,
+    1.629106879234314,
+    0.7076804637908936,
+    1.0280112028121948,
+    1.6639653444290161
+  ],
+  "argmax": 0,
+  "num_logits": 14,
+  "float_abs_tol": 0.0001,
+  "model_basename": "best_mobilenet_v3_large_dynamic.tflite",
+  "model_sha256": "5134a7e9e49dd6b136700aa128c3ae3efc08dc585351ec56ab4f66b254e4ac4e",
+  "preprocess": "Resize(256)+CenterCrop(224)+RGB/255+ImageNet mean/std, NHWC float32"
+}
